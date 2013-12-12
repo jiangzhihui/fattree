@@ -1,0 +1,303 @@
+#include <iostream>
+#include <sstream>
+#include "fattree.h"
+
+using std::string;
+using std::cout; 
+using std::endl;
+using std::stringstream;
+
+/*
+void generate(int k){
+    for(int pod = 0 ; pod < k; pod ++){
+        for(int swit = k/2; swit < k ; swit++){
+            cout << "switch ip address 10." << pod <<"." << swit << "." << 1 << endl;
+            for(int subnet = 0 ; subnet < k/2 ; subnet ++){
+                cout << "10." << pod << "." << swit <<".1   "; 
+                cout << "10." << pod << "." << subnet <<".0/24  "; 
+                cout << subnet << endl;
+            }
+            //cout << "10." << pod << "." << swit <<".1   "; 
+            //cout << "0.0.0.0/0  0" << endl;
+            for(int host = 2; host <= k/2+1 ;host ++){
+                cout << "10." << pod <<"." << swit <<".1   " ; 
+                cout << "0.0.0." << host << "/8 " ; 
+                cout << (host-2+swit)%(k/2)+k/2 << endl; 
+            }
+
+            cout << "\n\n\n" << endl;
+        }
+    }
+}
+*/
+
+void fattree::Engine::init_cores(){
+    int id = 0; 
+    string ip;
+    for(int i = 1; i <= k/2; i++)
+        for(int j = 1; j <= k/2; j++){
+            stringstream ss; 
+            ss << "10." ; 
+            ss << k ; 
+            ss << "."; 
+            ss << i;     
+            ss << ".";
+            ss << j;
+            ss >> ip ; 
+            cores[id++] = CoreSwitch(ip,k);
+        }
+}
+
+void fattree::Engine::init_aggrs(){
+    int id = 0; 
+    string ip ;
+    for(int pod = 0; pod < k ; pod ++){
+        for(int swi = k/2; swi < k; swi ++){
+            stringstream ss; 
+            ss << "10." ; 
+            ss << pod; 
+            ss << ".";
+            ss << swi; 
+            ss << ".1";
+            ss >> ip ; 
+            aggrs[id++] = AggrSwitch(ip,k);
+        }
+    }
+}
+
+void fattree::Engine::init_edges(){
+    int id = 0; 
+    string ip;
+    for(int pod = 0; pod < k; pod ++){
+        for(int swi = 0; swi < k/2; swi++){
+            stringstream ss; 
+            ss << "10.";
+            ss << pod; 
+            ss << ".";
+            ss << swi; 
+            ss << ".1";
+            ss >> ip ; 
+            edges[id++] = EdgeSwitch(ip,k);
+        }
+    }
+}
+
+void fattree::Engine::init_hosts(){
+    int id = 0; 
+    string ip; 
+    for(int pod = 0; pod < k; pod ++){
+        for(int swi = 0 ; swi < k/2; swi ++){
+            for(int h = 2; h <= k/2 + 1; h++){
+                stringstream ss; 
+                ss <<  "10." ; 
+                ss << pod; 
+                ss << ".";
+                ss << swi; 
+                ss << ".";
+                ss << h; 
+                ss >> ip ; 
+                hosts[id++] = Host(ip);
+            }
+        }
+    }
+}
+
+void fattree::Engine::connect_core_aggr(){
+    for(int i = 0; i < k/2; i++){
+        for(int j = 0; j < k/2; j++){
+            int id = i*k/2+j;
+            CoreSwitch & cs = cores[id];
+
+            //connect each port to the aggr switches
+            for(int pod = 0; pod < k; pod++){
+                int aggr_id = pod*k/2 + i;
+                AggrSwitch & as = aggrs[aggr_id]; 
+                cs.set_switch(pod,&as); 
+                //cout << cs.get_ip() << " --> "  << as.get_ip() << endl;
+            }
+        }
+    }
+    //cout << endl << endl;
+}
+
+/*
+connect each AggrSwitch to k/2 core switch from its port k/2 ~ k-1
+*/
+void fattree::Engine::connect_aggr_core(){
+    for(int pod = 0; pod < k; pod ++){
+        for(int i = 0; i < k/2; i++){
+            int id = pod*k/2 + i;
+            AggrSwitch& as = aggrs[id];
+            
+            //connect each port to a Core Switch 
+            for(int p = 0; p < k/2; p++){
+                int cs_id = i*k/2 + p; 
+                CoreSwitch & cs = cores[cs_id];
+                as.set_switch(k/2+p,&cs); 
+                //cout << as.get_ip() << " --> " << cs.get_ip() << endl;
+            }
+        }
+    }
+
+    //cout << endl << endl;
+}
+
+/*
+connect each Aggr Switch to edge switches from its port 0~(k/2-1)
+*/
+void fattree::Engine::connect_aggr_edge(){
+    for(int pod = 0; pod < k; pod ++){
+        for(int i = 0; i < k/2; i++){
+            int id = pod*k/2 + i; 
+            AggrSwitch& as = aggrs[id];
+
+            //connect each port [0,k/2) to the lower level edge switches 
+            for(int port = 0; port < k/2; port ++){
+                int id = pod*k/2 + port; 
+                EdgeSwitch& es = edges[id]; 
+                as.set_switch(port,&es);
+                //cout << as.get_ip() << " --> " << es.get_ip() << endl;
+            }
+        }
+    }
+    //cout << endl << endl;
+}
+
+/*
+connect edge switch to upper level aggr switches 
+*/
+void fattree::Engine::connect_edge_aggr(){
+    for(int pod = 0; pod < k; pod ++){
+        for(int i=0; i < k/2; i++){
+            //the index of the edge switch 
+            int id = pod*k/2 + i; 
+            EdgeSwitch&es = edges[id];
+
+            //connect its port [k/2,k) to the aggr switch
+            for(int port = k/2; port < k; port ++){
+                int aggr_id = pod*k/2 + port-k/2;
+                AggrSwitch& as = aggrs[aggr_id];
+                es.set_switch(port,&as);
+                //cout << es.get_ip() << " --> " << as.get_ip() << endl;
+            }
+        }
+    }
+    //cout << endl << endl;
+}
+
+/*
+connect edge switch to its lower level hosts 
+*/
+void fattree::Engine::connect_edge_host(){
+    for(int pod = 0; pod < k; pod ++){
+        for(int i = 0; i < k/2; i++){
+            int id = pod*k/2 + i; 
+            EdgeSwitch& es = edges[id];
+            
+            for(int port = 0; port < k/2; port ++){
+                int host_id = pod*(k/2)*(k/2) + i*k/2 + port; 
+                Host& h = hosts[host_id]; 
+                es.set_host(port,&h);      
+                //cout << es.get_ip() << " --> " << h.get_ip() << endl;
+            }
+        }
+    }
+    //cout << endl << endl;
+}
+
+/*
+connect each host to its upper level edge switches 
+*/
+void fattree::Engine::connect_host_edge(){
+    for(int pod = 0; pod < k; pod ++){
+        for(int e = 0; e < k/2; e++){
+            for(int h = 0; h < k/2; h++){
+                Host& host = hosts[pod*(k/2)*(k/2)+e*k/2+h];
+                EdgeSwitch& es = edges[pod*k/2+e];
+                host.set_switch(&es);    
+                //cout << host.get_ip () << " --> " << es.get_ip() << endl; 
+            }
+        }
+    }
+    //cout << endl << endl;
+}
+
+/*
+connect all the devices in a datacenter 
+*/
+void fattree::Engine::connect_devices(){
+    connect_core_aggr();
+    connect_aggr_core();
+    connect_aggr_edge();
+    connect_edge_aggr();
+    connect_edge_host();
+    connect_host_edge();
+}
+
+void fattree::Engine::init_devices(){
+    init_cores();
+    init_aggrs();
+    init_edges();
+    init_hosts();
+}
+
+void fattree::Engine::print_cores(){
+    cout << "The ip of all the core switches:" << endl;
+    for(size_t i = 0; i < cores.size() ; i++){
+        cout << cores[i].get_ip() << endl; 
+        /*
+        cout << "the aggr switches it connects to:"  << endl; 
+        for(int p = 0; p < k; p++){
+            AggrSwitch * asp = cores[i].switches[p];
+            if(asp == NULL)
+                cout << p << " NULL" << endl;
+            else 
+                cout << p << "->" << cores[i].switches[p]->get_ip() << endl;
+        }
+        */
+    }
+}
+
+void fattree::Engine::print_edges(){
+    cout <<"The ip of all the edge switches:" << endl;
+    for(size_t i =0 ; i < edges.size(); i ++){
+        cout << edges[i].get_ip() << endl;
+        /*
+        cout <<"the core switches it connects to: " << endl;
+        for(int j = 0; j < k/2; j++)
+            cout << k/2+j << "->" << edges[i].switches[j]->get_ip() << endl;
+        cout << "the hosts it connects to: " << endl; 
+        for(int j = 0; j < k/2; j++)
+            cout << j << "->" << edges[i].hosts[j]->get_ip() << endl; 
+        */
+    }
+}
+
+void fattree::Engine::print_aggrs(){
+    cout <<"The ip of all the aggr switches:" << endl;
+    for(size_t i = 0; i < aggrs.size(); i++){
+        cout << aggrs[i].get_ip() << endl;
+        /*
+        cout << "the core switches it connects to:" << endl;
+        for(int j = 0; j < k/2; j++)
+            cout << k/2+j << "->" << aggrs[i].cs[j]->get_ip() << endl;  
+        cout <<"the edge switches it connects to:" << endl;
+        for(int j = 0; j < k/2; j++)
+            cout << j << "->" << aggrs[i].es[j]->get_ip() << endl;  
+        */
+    }
+}
+
+void fattree::Engine::print_hosts(){
+    cout <<"The ip of all the hosts:" << endl; 
+    for(size_t i = 0; i < aggrs.size(); i++){
+        cout << hosts[i].get_ip() << endl;
+        //cout << "the switch it connects to " << hosts[i].swit->get_ip() << endl;
+    }
+}
+
+
+void fattree::Engine::print_core_table(){
+    for(int i = 0; i < k*k/4; i++)
+        cores[i].print_route_table();      
+}
