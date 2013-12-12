@@ -33,6 +33,6 @@ int main()
     e.print_hosts();
     e.print_edges();
     */
-    e.print_core_table();
+    e.print_aggr_table();
 }
 

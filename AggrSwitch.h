@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <string>
+#include "utility.h"
 
 namespace fattree{
 
@@ -14,7 +15,9 @@ class AggrSwitch{
 public:
     AggrSwitch(std::string ip="",size_t ports = 4)
         :ports(ports),es(ports/2),cs(ports/2),ip(ip)
-    {}    
+    {
+ //       generate_route_table();
+    }    
 
     void set_switch(size_t port_id, CoreSwitch* s);
     void set_switch(size_t port_id, EdgeSwitch* s);
@@ -24,11 +27,19 @@ public:
         return ip; 
     }
 
+    void print_route_table();
+    //generate first level and second level routing table
+    void generate_route_table();
+
+private:
+
+
 private:
     size_t ports; 
     std::vector<EdgeSwitch*> es; 
     std::vector<CoreSwitch*> cs;
     std::string ip;
+    IpPortTable table1,table2; 
 
 };//AggrSwtich
 

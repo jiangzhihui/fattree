@@ -12,7 +12,7 @@ class AggrSwitch;
 class CoreSwitch{
 public:
     CoreSwitch(std::string ip="",size_t ports = 4):ports(ports),switches(ports),ip(ip){
-        generate_route_table();     
+//        generate_route_table();     
     }
 
     void set_switch(size_t port_id, AggrSwitch* s);

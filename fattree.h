@@ -24,6 +24,7 @@ public:
     void print_aggrs();
     void print_hosts();
     void print_core_table();
+    void print_aggr_table();
 private:
     void init_devices();
     void init_cores();             

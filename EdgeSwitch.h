@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <string> 
+#include "utility.h"
 
 namespace fattree{
 
@@ -22,12 +23,16 @@ public:
     std::string get_ip() const {
         return ip;
     }
+    
+    void generate_route_table();
+    void print_route_table();
 
 private:
     size_t ports; 
     std::vector<Host*> hosts;
     std::vector<AggrSwitch*> switches; 
     std::string ip;
+    IpPortTable table;
 
 };//EdgeSwitch
 

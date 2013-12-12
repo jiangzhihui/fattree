@@ -45,6 +45,7 @@ void fattree::Engine::init_cores(){
             ss << j;
             ss >> ip ; 
             cores[id++] = CoreSwitch(ip,k);
+            cores[id-1].generate_route_table();
         }
 }
 
@@ -61,6 +62,7 @@ void fattree::Engine::init_aggrs(){
             ss << ".1";
             ss >> ip ; 
             aggrs[id++] = AggrSwitch(ip,k);
+            aggrs[id-1].generate_route_table();
         }
     }
 }
@@ -300,4 +302,9 @@ void fattree::Engine::print_hosts(){
 void fattree::Engine::print_core_table(){
     for(int i = 0; i < k*k/4; i++)
         cores[i].print_route_table();      
+}
+
+void fattree::Engine::print_aggr_table(){
+    for(int i = 0; i < k*k/2; i++)
+        aggrs[i].print_route_table();
 }
