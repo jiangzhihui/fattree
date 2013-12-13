@@ -19,7 +19,7 @@ void fattree::AggrSwitch::generate_route_table(){
     vector<int> dotted_ip = split_ip(ip); 
     int pod = dotted_ip[1];
     int swi = dotted_ip[2];
-    for(int s = 0; s < ports/2; s ++){
+    for(size_t s = 0; s < ports/2; s ++){
         string key = "10."; 
         key += itoa(pod);
         key += ".";
@@ -29,7 +29,7 @@ void fattree::AggrSwitch::generate_route_table(){
     }
 
     //generate second level table for the ips in different pods
-    for(int host = 2; host <= ports/2+1; host++){
+    for(size_t host = 2; host <= ports/2+1; host++){
         int port = (host-2+swi)%(ports/2) ;
         string key = "0.0.0."; 
         key += itoa(host); 

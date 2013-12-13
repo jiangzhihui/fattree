@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cassert>
 #include "host.h"
 #include "EdgeSwitch.h" 
 
@@ -13,16 +14,25 @@ void fattree::EdgeSwitch::set_host(size_t port, Host * h){
 }
 
 void fattree::EdgeSwitch::generate_route_table(){
-    for(int i = 0; i < ports/2; i++){
-        string key = hosts[i]->get_ip(); 
-        table[key] = i;    
+    vector<int> dotted_ip = split_ip(ip);
+    int pod = dotted_ip[1];
+    int swi = dotted_ip[2];
+    for(size_t i = 2; i <= ports/2+1; i++){
+        string key = "10."; 
+        key += itoa(pod);
+        key += ".";
+        key += itoa(swi);
+        key += ".";
+        key += itoa(i);
+        table[key] = i-2;
     }
 }
 
 void fattree::EdgeSwitch::print_route_table(){
     IpPortTable::iterator pos = table.begin();
     while(pos != table.end()){
-        cout << pos->first << "->" << pos->second << endl;    
+        assert(hosts[pos->second] != NULL);
+        cout << pos->first << "->" << pos->second << "->" << hosts[pos->second]->get_ip()<< endl;    
         pos++;
     }
 }

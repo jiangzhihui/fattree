@@ -80,6 +80,7 @@ void fattree::Engine::init_edges(){
             ss << ".1";
             ss >> ip ; 
             edges[id++] = EdgeSwitch(ip,k);
+            edges[id-1].generate_route_table();
         }
     }
 }
@@ -307,4 +308,9 @@ void fattree::Engine::print_core_table(){
 void fattree::Engine::print_aggr_table(){
     for(int i = 0; i < k*k/2; i++)
         aggrs[i].print_route_table();
+}
+
+void fattree::Engine::print_edge_table(){
+    for(int i = 0; i < k*k/2; i++)
+        edges[i].print_route_table();
 }
