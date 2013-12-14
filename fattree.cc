@@ -1,11 +1,11 @@
 #include <iostream>
 #include <sstream>
+#include <cassert>
 #include "fattree.h"
 
-using std::string;
-using std::cout; 
-using std::endl;
-using std::stringstream;
+namespace fattree{
+
+using namespace std; 
 
 /*
 void generate(int k){
@@ -33,9 +33,10 @@ void generate(int k){
 
 void fattree::Engine::init_cores(){
     int id = 0; 
-    string ip;
     for(int i = 1; i <= k/2; i++)
         for(int j = 1; j <= k/2; j++){
+            string ip = connect_ip("10",itoa(k),itoa(i),itoa(j));
+            /*
             stringstream ss; 
             ss << "10." ; 
             ss << k ; 
@@ -44,6 +45,7 @@ void fattree::Engine::init_cores(){
             ss << ".";
             ss << j;
             ss >> ip ; 
+            */
             cores[id++] = CoreSwitch(ip,k);
             cores[id-1].generate_route_table();
         }
@@ -51,9 +53,10 @@ void fattree::Engine::init_cores(){
 
 void fattree::Engine::init_aggrs(){
     int id = 0; 
-    string ip ;
     for(int pod = 0; pod < k ; pod ++){
         for(int swi = k/2; swi < k; swi ++){
+            string ip = connect_ip("10",itoa(pod),itoa(swi),"1");
+            /*
             stringstream ss; 
             ss << "10." ; 
             ss << pod; 
@@ -61,6 +64,7 @@ void fattree::Engine::init_aggrs(){
             ss << swi; 
             ss << ".1";
             ss >> ip ; 
+            */
             aggrs[id++] = AggrSwitch(ip,k);
             aggrs[id-1].generate_route_table();
         }
@@ -69,9 +73,10 @@ void fattree::Engine::init_aggrs(){
 
 void fattree::Engine::init_edges(){
     int id = 0; 
-    string ip;
     for(int pod = 0; pod < k; pod ++){
         for(int swi = 0; swi < k/2; swi++){
+            string ip = connect_ip("10",itoa(pod),itoa(swi),"1");
+            /*
             stringstream ss; 
             ss << "10.";
             ss << pod; 
@@ -79,6 +84,7 @@ void fattree::Engine::init_edges(){
             ss << swi; 
             ss << ".1";
             ss >> ip ; 
+            */
             edges[id++] = EdgeSwitch(ip,k);
             edges[id-1].generate_route_table();
         }
@@ -87,10 +93,11 @@ void fattree::Engine::init_edges(){
 
 void fattree::Engine::init_hosts(){
     int id = 0; 
-    string ip; 
     for(int pod = 0; pod < k; pod ++){
         for(int swi = 0 ; swi < k/2; swi ++){
             for(int h = 2; h <= k/2 + 1; h++){
+                string ip = connect_ip("10",itoa(pod),itoa(swi),itoa(h));
+                /*
                 stringstream ss; 
                 ss <<  "10." ; 
                 ss << pod; 
@@ -99,6 +106,7 @@ void fattree::Engine::init_hosts(){
                 ss << ".";
                 ss << h; 
                 ss >> ip ; 
+                */
                 hosts[id++] = Host(ip);
             }
         }
@@ -176,16 +184,13 @@ void fattree::Engine::connect_edge_aggr(){
             int id = pod*k/2 + i; 
             EdgeSwitch&es = edges[id];
 
-            //connect its port [k/2,k) to the aggr switch
             for(int port = k/2; port < k; port ++){
                 int aggr_id = pod*k/2 + port-k/2;
                 AggrSwitch& as = aggrs[aggr_id];
                 es.set_switch(port,&as);
-                //cout << es.get_ip() << " --> " << as.get_ip() << endl;
             }
         }
     }
-    //cout << endl << endl;
 }
 
 /*
@@ -201,11 +206,9 @@ void fattree::Engine::connect_edge_host(){
                 int host_id = pod*(k/2)*(k/2) + i*k/2 + port; 
                 Host& h = hosts[host_id]; 
                 es.set_host(port,&h);      
-                //cout << es.get_ip() << " --> " << h.get_ip() << endl;
             }
         }
     }
-    //cout << endl << endl;
 }
 
 /*
@@ -218,7 +221,6 @@ void fattree::Engine::connect_host_edge(){
                 Host& host = hosts[pod*(k/2)*(k/2)+e*k/2+h];
                 EdgeSwitch& es = edges[pod*k/2+e];
                 host.set_switch(&es);    
-                //cout << host.get_ip () << " --> " << es.get_ip() << endl; 
             }
         }
     }
@@ -314,3 +316,27 @@ void fattree::Engine::print_edge_table(){
     for(int i = 0; i < k*k/2; i++)
         edges[i].print_route_table();
 }
+
+Packet fattree::Engine::generate_rand_packet(){
+    Packet pkt; 
+    string src,dest; 
+    src = rand_ip(k); 
+    while((dest=rand_ip(k)) == src){}                             
+    pkt.src = src;
+    pkt.dest = dest;
+    for(int i = 0; i < MAX_LENGTH; i++)
+        pkt.data[i] = get_rand(0,256);    
+    return pkt;
+}
+
+void fattree::Engine::send_packet(Packet & pkt){
+    vector<int> ips = split_ip(pkt.src);
+    int pod = ips[1];
+    int swi = ips[2];
+    int h = ips[3];
+    int id = pod * k/2*k/2 + swi*k/2 + h;     
+    assert(id < hosts.size());
+    hosts[id].send_packet(pkt);
+}
+
+}//fattree

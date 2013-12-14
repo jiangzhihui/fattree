@@ -14,11 +14,25 @@ namespace fattree{
 //a map from ip to output port of a switch
 typedef std::map<std::string,int> IpPortTable;
 
-std::vector<int> split_ip(std::string ip);
+using std::string;
+
+std::vector<int> split_ip(string ip);
+
+string connect_ip(const string  s1, const string s2 , const string  s3, const string  s4);
 
 //convert an int to a string 
-std::string itoa(int i);
+string itoa(int i);
+
+//get a random int in the range [low,high)
+int get_rand(int low , int high);
+
+/*
+get a random host ip address 
+ports is the number of port of the switches
+*/
+string rand_ip(int ports);
 
 }//fattree
+
 
 #endif 

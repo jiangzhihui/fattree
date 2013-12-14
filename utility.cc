@@ -34,4 +34,23 @@ string itoa(int i){
     return re;
 }
 
+string connect_ip(const string s1 , const string s2, const string s3 , const string s4){
+    string re = s1 + "." + s2 + "." + s3 + "." + s4;
+    return re;
+}
+
+int get_rand(int low , int high){
+    int delta = high - low; 
+    int r = rand() % delta;
+    return low + r;
+}
+
+string rand_ip(int ports){
+    int pod = get_rand(0,ports);        
+    int swi = get_rand(0,ports/2);
+    int h   = get_rand(2,ports/2+2);
+
+    return connect_ip("10",itoa(pod),itoa(swi),itoa(h));
+}
+
 }//fattree

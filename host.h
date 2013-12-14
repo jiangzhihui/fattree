@@ -7,6 +7,7 @@
 namespace fattree{
 
 class EdgeSwitch;
+class Packet;
 
 class Host{
 public:
@@ -14,10 +15,11 @@ public:
     void set_switch(EdgeSwitch*s){
         swit = s;
     }
-    void send();
+    void send_packet(Packet &);
     std::string get_ip() const {
         return ip;
     }
+    
 private:
     std::string ip;
     EdgeSwitch* swit;               //switch the host connects to 

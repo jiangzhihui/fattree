@@ -18,7 +18,7 @@ public:
 
     void set_host(size_t port_id, Host * host);
     void set_switch(size_t port_id, AggrSwitch* s);
-    void send(size_t port);
+    void send_packet(Packet & pkt);
     void recv(size_t port);
     std::string get_ip() const {
         return ip;

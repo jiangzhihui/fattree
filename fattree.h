@@ -7,6 +7,7 @@
 #include "EdgeSwitch.h" 
 #include "AggrSwitch.h" 
 #include "CoreSwitch.h"
+#include "packet.h"
 
 namespace fattree{
 
@@ -26,6 +27,12 @@ public:
     void print_core_table();
     void print_aggr_table();
     void print_edge_table();
+
+    /*
+    generate a packet with random source host and destination host with random data
+    */
+    Packet generate_rand_packet(); 
+    void send_packet(Packet&);
 private:
     void init_devices();
     void init_cores();             
@@ -42,6 +49,7 @@ private:
     
 
 private:
+    //k is the port number of a switch 
     int k ; 
     std::vector<Host> hosts;
     std::vector<CoreSwitch> cores; 
