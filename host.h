@@ -15,7 +15,8 @@ public:
     void set_switch(EdgeSwitch*s){
         swit = s;
     }
-    void send_packet(Packet &);
+    void send_packet(const Packet &);
+    void recv_packet(const Packet &);
     std::string get_ip() const {
         return ip;
     }

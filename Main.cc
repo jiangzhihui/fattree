@@ -20,9 +20,11 @@
 #include<algorithm>
 #include<cmath>
 #include "fattree.h"
+#include "packet.h"
 
 using namespace std; 
 using fattree::Engine;
+using fattree::Packet;
 
 int main()
 {
@@ -33,6 +35,10 @@ int main()
     e.print_hosts();
     e.print_edges();
     */
-    e.print_edge_table();
+    for(int i = 0; i < 10; i ++){
+        Packet p = e.generate_rand_packet();
+        e.send_packet(p);
+    }
 }
+
 

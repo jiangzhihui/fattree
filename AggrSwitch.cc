@@ -1,7 +1,10 @@
 #include <iostream>
+#include <cassert>
 #include "AggrSwitch.h"
 #include "EdgeSwitch.h"
 #include "CoreSwitch.h"
+#include "packet.h"
+#include "debug.h"
 
 
 using namespace std; 
@@ -50,4 +53,26 @@ void fattree::AggrSwitch::print_route_table(){
         pos ++;
     }
     cout << endl;
+}
+
+
+void fattree::AggrSwitch::send_packet(const Packet& pkt){
+    string dest = pkt.dest;
+    vector<int> ips = split_ip(dest);
+    string prefix = connect_ip("10",itoa(ips[1]),itoa(ips[2]),"0");
+    IpPortTable::iterator pos = table1.find(prefix);
+    if(pos != table1.end()){
+        size_t i = pos->second;
+        assert(i < es.size());
+        Debug::info("Aggr switch " +  get_ip() + " send a packet to " + es[i]->get_ip());
+        es[i]->send_packet(pkt);
+    }else {
+        string suffix = connect_ip("0","0","0",itoa(ips[3]));
+        pos = table2.find(suffix);
+        assert(pos != table2.end());
+        int i = pos->second; 
+        Debug::info("Aggr switch " + get_ip() + " send a packet to " + cs[i]->get_ip());
+        cs[i]->send_packet(pkt);
+        
+    }
 }

@@ -9,6 +9,7 @@ namespace fattree{
 
 class Host;
 class AggrSwitch;
+class Packet;
 
 class EdgeSwitch{
 public:
@@ -18,7 +19,7 @@ public:
 
     void set_host(size_t port_id, Host * host);
     void set_switch(size_t port_id, AggrSwitch* s);
-    void send_packet(Packet & pkt);
+    void send_packet(const Packet & pkt);
     void recv(size_t port);
     std::string get_ip() const {
         return ip;
@@ -32,6 +33,8 @@ private:
     std::vector<Host*> hosts;
     std::vector<AggrSwitch*> switches; 
     std::string ip;
+
+    //table stores the map to hosts
     IpPortTable table;
 
 };//EdgeSwitch

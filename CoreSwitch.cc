@@ -1,7 +1,10 @@
 #include <iostream>
+#include <cassert>
 #include "CoreSwitch.h"
 #include "AggrSwitch.h"
 #include "utility.h" 
+#include "packet.h"
+#include "debug.h"
 
 using namespace std; 
 
@@ -38,4 +41,14 @@ void fattree::CoreSwitch::print_route_table(){
         cout << pos->first << "->" << pos->second  << "->" << switches[pos->second]->get_ip()<< endl; 
         pos ++;
     }
+}
+
+void fattree::CoreSwitch::send_packet(const Packet & pkt){
+    string dest = pkt.dest;
+    vector<int> ips = split_ip(dest);
+    string mask = connect_ip("10",itoa(ips[1]),"0","0");
+    IpPortTable::iterator pos = route_table.find(mask);
+    assert(pos != route_table.end());
+    Debug::info("Core Switch " + get_ip() + " send a packet to " + switches[pos->second]->get_ip());
+    switches[pos->second]->send_packet(pkt);
 }

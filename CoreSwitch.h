@@ -8,6 +8,7 @@
 namespace fattree{
 
 class AggrSwitch;
+class Packet;
 
 class CoreSwitch{
 public:
@@ -16,7 +17,7 @@ public:
     }
 
     void set_switch(size_t port_id, AggrSwitch* s);
-    void send(size_t port);
+    void send_packet(const Packet &  );
     void recv(size_t port);
     std::string get_ip() const {
         return ip;

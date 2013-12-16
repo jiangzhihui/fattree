@@ -32,6 +32,7 @@ ports is the number of port of the switches
 */
 string rand_ip(int ports);
 
+
 }//fattree
 
 

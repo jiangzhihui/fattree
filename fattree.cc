@@ -326,15 +326,21 @@ Packet fattree::Engine::generate_rand_packet(){
     pkt.dest = dest;
     for(int i = 0; i < MAX_LENGTH; i++)
         pkt.data[i] = get_rand(0,256);    
+
+    string debug_info = "Generated a packet with source " + src + " and dest " + dest; 
+    Debug::info(debug_info);
+
     return pkt;
 }
 
 void fattree::Engine::send_packet(Packet & pkt){
+    Debug::info("Engine starts sending a packet");
     vector<int> ips = split_ip(pkt.src);
     int pod = ips[1];
     int swi = ips[2];
     int h = ips[3];
-    int id = pod * k/2*k/2 + swi*k/2 + h;     
+    size_t id = pod * k/2*k/2 + swi*k/2 + (h-2) ;     
+    //cout << pod <<  " " << swi << " " << h << " " << id << endl;
     assert(id < hosts.size());
     hosts[id].send_packet(pkt);
 }

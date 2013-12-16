@@ -8,6 +8,7 @@
 #include "AggrSwitch.h" 
 #include "CoreSwitch.h"
 #include "packet.h"
+#include "debug.h"
 
 namespace fattree{
 

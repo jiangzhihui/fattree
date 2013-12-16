@@ -54,14 +54,20 @@ void Host::set_switch(Switch * s){
     swi = s;
 }
 
+#define GREEN "\033[32m" 
+#define DEFAULT "\033[0m"
 
 int main()
 {
+    /*
     Switch s; 
     Host h;
     h.set_switch(&s);
     s.set_host(&h);
     h.send();
     cout << fattree::vi.size() << endl;
+    */
+    
+    cout << GREEN << " hello word" << DEFAULT << endl; 
 }
 
