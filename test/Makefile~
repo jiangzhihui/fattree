@@ -1,0 +1,2 @@
+run:
+	g++ test_utility.cc ../utility.cc
