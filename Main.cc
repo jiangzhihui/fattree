@@ -19,6 +19,7 @@
 #include<list>
 #include<algorithm>
 #include<cmath>
+#include<cstdlib>
 #include "fattree.h"
 #include "packet.h"
 
@@ -28,6 +29,7 @@ using fattree::Packet;
 
 int main()
 {
+    srand(time(NULL));
     Engine e(4);    
     /*
     e.print_cores();
@@ -38,6 +40,7 @@ int main()
     for(int i = 0; i < 10; i ++){
         Packet p = e.generate_rand_packet();
         e.send_packet(p);
+        cout << endl;
     }
 }
 
