@@ -38,6 +38,9 @@ public:
 
     std::vector<int> get_edge_hit_cnt();
     std::vector<int> get_edge_miss_cnt(); 
+    std::vector<int> get_aggr_hit_cnt();
+    std::vector<int> get_aggr_miss_cnt();
+
 private:
     void init_devices();
     void init_cores();             
@@ -52,6 +55,7 @@ private:
     void connect_edge_host();
     void connect_host_edge();
     void set_edge_cache();    
+    void set_aggr_cache();
     void set_caches();
 
 private:

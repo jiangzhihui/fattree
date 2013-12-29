@@ -253,6 +253,28 @@ void fattree::Engine::init_devices(){
 
 void fattree::Engine::set_caches(){
     set_edge_cache();
+    set_aggr_cache();
+}
+
+/*
+select random aggr switches to set a cache
+*/
+void fattree::Engine::set_aggr_cache(){
+    int caches = aggrs.size() / 2; 
+    int cnt = 0; 
+    vector<bool> cached(aggrs.size(),0);
+    while(cnt < caches){
+        int i = get_rand(0,aggrs.size());
+        if(!cached[i]){
+            cnt ++;
+            cached[i] = 1; 
+        }
+    }
+
+    for(size_t i = 0; i < aggrs.size(); i++){
+        if(cached[i])
+            aggrs[i].set_cache(new Cache(MAX_AGGR_CACHE));
+    }
 }
 
 /*
@@ -280,7 +302,7 @@ void fattree::Engine::set_edge_cache(){
 vector<int> fattree::Engine::get_edge_hit_cnt(){
 
     vector<int> cnt(edges.size(),-1);
-    for(int i = 0; i < edges.size(); i++){
+    for(size_t i = 0; i < edges.size(); i++){
         cnt[i] = edges[i].get_cache_hit();
     }
 
@@ -289,8 +311,25 @@ vector<int> fattree::Engine::get_edge_hit_cnt(){
 
 vector<int> fattree::Engine::get_edge_miss_cnt(){
     vector<int> cnt(edges.size(),-1);
-    for(int i = 0; i < edges.size(); i++){
+    for(size_t i = 0; i < edges.size(); i++){
         cnt[i] = edges[i].get_cache_miss();
+    }
+    return cnt;
+}
+
+vector<int> fattree::Engine::get_aggr_hit_cnt(){
+    vector<int> cnt(aggrs.size(),-1);
+    for(size_t i = 0; i < aggrs.size(); i++){
+        cnt[i] = aggrs[i].get_cache_hit();
+    }
+
+    return cnt;
+}
+
+vector<int> fattree::Engine::get_aggr_miss_cnt(){
+    vector<int> cnt(aggrs.size(),-1);
+    for(size_t i = 0; i < aggrs.size(); i++){
+        cnt[i] = aggrs[i].get_cache_miss();
     }
     return cnt;
 }
