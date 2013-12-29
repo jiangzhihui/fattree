@@ -1,6 +1,7 @@
 #include <iostream>
 #include <sstream>
 #include <cassert>
+#include <climits>
 #include "fattree.h"
 
 namespace fattree{
@@ -239,11 +240,59 @@ void fattree::Engine::connect_devices(){
     connect_host_edge();
 }
 
+/*
+init switches and hosts
+*/
 void fattree::Engine::init_devices(){
     init_cores();
     init_aggrs();
     init_edges();
     init_hosts();
+    set_caches();
+}
+
+void fattree::Engine::set_caches(){
+    set_edge_cache();
+}
+
+/*
+select random edge switches to set a cache
+*/
+void fattree::Engine::set_edge_cache(){
+    int caches = edges.size()/2;   
+    int cnt = 0; 
+    vector<bool> cached(edges.size(),0);  
+    while(cnt < caches){
+        int i = get_rand(0,edges.size());
+        if(!cached[i]){
+            cnt ++;
+            cached[i] = 1;    
+        }
+    }
+
+    for(size_t i = 0; i < edges.size(); i++){
+        if(cached[i]){
+            edges[i].set_cache(new Cache(MAX_EDGE_CACHE));
+        }
+    }
+}
+
+vector<int> fattree::Engine::get_edge_hit_cnt(){
+
+    vector<int> cnt(edges.size(),-1);
+    for(int i = 0; i < edges.size(); i++){
+        cnt[i] = edges[i].get_cache_hit();
+    }
+
+    return cnt;
+}
+
+vector<int> fattree::Engine::get_edge_miss_cnt(){
+    vector<int> cnt(edges.size(),-1);
+    for(int i = 0; i < edges.size(); i++){
+        cnt[i] = edges[i].get_cache_miss();
+    }
+    return cnt;
 }
 
 void fattree::Engine::print_cores(){
@@ -325,7 +374,7 @@ Packet fattree::Engine::generate_rand_packet(){
     pkt.src = src;
     pkt.dest = dest;
     for(int i = 0; i < MAX_LENGTH; i++)
-        pkt.data[i] = get_rand(0,256);    
+        pkt.data[i] = get_rand(0,USHRT_MAX);    
 
     string debug_info = "Generated a packet with source " + src + " and dest " + dest; 
     Debug::info(debug_info);

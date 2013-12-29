@@ -6,7 +6,7 @@
 
 namespace fattree{
  
-const int MAX_LENGTH=64;
+const int MAX_LENGTH=1;
 
 struct  Packet{   
     Packet(){
@@ -14,7 +14,7 @@ struct  Packet{
     }
     std::string src; 
     std::string dest;
-    unsigned char data[MAX_LENGTH];
+    unsigned int data[MAX_LENGTH];
 };
 
 }//fattree

@@ -7,8 +7,10 @@ bool Cache::get(Key key, Packet & value){
     map<Key,Packet>::iterator pos = mp.find(key);
     if(pos != mp.end()){
         value = pos->second;    
+        _hit_cnt++;
         return true;
     }
+    _miss_cnt++;
     return false;
 }
 
@@ -28,4 +30,12 @@ void Cache::put(Key key, const Packet & value){
         cache.push_front(KVPair(key,value));
         _size++;
     }
+}
+
+size_t Cache::miss_cnt(){
+    return _miss_cnt;
+}
+
+size_t Cache::hit_cnt(){
+    return _hit_cnt;
 }

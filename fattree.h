@@ -8,6 +8,7 @@
 #include "AggrSwitch.h" 
 #include "CoreSwitch.h"
 #include "packet.h"
+#include "Cache.h"
 #include "debug.h"
 
 namespace fattree{
@@ -34,6 +35,9 @@ public:
     */
     Packet generate_rand_packet(); 
     void send_packet(Packet&);
+
+    std::vector<int> get_edge_hit_cnt();
+    std::vector<int> get_edge_miss_cnt(); 
 private:
     void init_devices();
     void init_cores();             
@@ -47,7 +51,8 @@ private:
     void connect_edge_aggr();
     void connect_edge_host();
     void connect_host_edge();
-    
+    void set_edge_cache();    
+    void set_caches();
 
 private:
     //k is the port number of a switch 
@@ -56,6 +61,9 @@ private:
     std::vector<CoreSwitch> cores; 
     std::vector<EdgeSwitch> edges;
     std::vector<AggrSwitch> aggrs;
+    static const unsigned int MAX_EDGE_CACHE = 10000;
+    static const unsigned int MAX_AGGR_CACHE = 1000; 
+    static const unsigned int MAX_CORE_CACHE = 1000;
 };//engine 
 
 }//fattree

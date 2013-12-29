@@ -5,7 +5,9 @@
 #include "EdgeSwitch.h" 
 #include "AggrSwitch.h"
 #include "packet.h"
+#include "Cache.h"
 #include "debug.h"
+
 
 using namespace std; 
 
@@ -43,6 +45,12 @@ If not found, then the send the packet to upper level switches
 */
 void fattree::EdgeSwitch::send_packet(const Packet& pkt){
     string dest = pkt.dest; 
+    unsigned int data = pkt.data[0];
+    if(cache){
+        Packet p; 
+        if(!cache->get(data,p))
+            cache->put(data,p);
+    }
     IpPortTable::iterator pos = table.find(dest);
     if(pos != table.end()){
         int port = pos->second;
@@ -54,3 +62,16 @@ void fattree::EdgeSwitch::send_packet(const Packet& pkt){
         switches[swi]->send_packet(pkt);
     }
 }
+
+int fattree::EdgeSwitch::get_cache_hit(){
+    if(cache)
+        return cache->hit_cnt();
+    return -1;
+}
+
+int fattree::EdgeSwitch::get_cache_miss(){
+    if(cache)
+        return cache->miss_cnt();
+    return -1;
+}
+

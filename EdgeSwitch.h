@@ -10,11 +10,12 @@ namespace fattree{
 class Host;
 class AggrSwitch;
 class Packet;
+class Cache;
 
 class EdgeSwitch{
 public:
     EdgeSwitch(std::string ip="", size_t ports = 4)
-        :ports(ports),hosts(ports/2),switches(ports/2),ip(ip)
+        :ports(ports),hosts(ports/2),switches(ports/2),ip(ip),cache(NULL)
     {}
 
     void set_host(size_t port_id, Host * host);
@@ -27,6 +28,11 @@ public:
     
     void generate_route_table();
     void print_route_table();
+    int get_cache_hit();
+    int get_cache_miss();
+    void set_cache(Cache * c){
+        cache = c;
+    }
 
 private:
     size_t ports; 
@@ -36,6 +42,7 @@ private:
 
     //table stores the map to hosts
     IpPortTable table;
+    Cache * cache;
 
 };//EdgeSwitch
 
