@@ -9,12 +9,14 @@ namespace fattree{
 
 class AggrSwitch;
 class Packet;
+class Cache;
 
 class CoreSwitch{
 public:
-    CoreSwitch(std::string ip="",size_t ports = 4):ports(ports),switches(ports),ip(ip){
+    CoreSwitch(std::string ip="",size_t ports = 4):ports(ports),switches(ports),ip(ip),cache(NULL){
 //        generate_route_table();     
     }
+    ~CoreSwitch();
 
     void set_switch(size_t port_id, AggrSwitch* s);
     void send_packet(const Packet &  );
@@ -24,6 +26,12 @@ public:
     }
     void generate_route_table();
     void print_route_table();
+
+    int get_cache_hit();
+    int get_cache_miss();
+    void set_cache(Cache* c){
+        cache = c;
+    }
 
 private:
 
@@ -35,6 +43,7 @@ private:
     std::vector<AggrSwitch*> switches; 
     std::string ip;
     IpPortTable route_table;
+    Cache * cache;
 
 };//CoreSwitch
 

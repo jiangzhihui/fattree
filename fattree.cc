@@ -254,6 +254,30 @@ void fattree::Engine::init_devices(){
 void fattree::Engine::set_caches(){
     set_edge_cache();
     set_aggr_cache();
+    set_core_cache();
+}
+
+//!!!!!!  the following three methods to be reconstructed 
+/*
+select random core switches to set a cache
+*/
+void fattree::Engine::set_core_cache(){
+    int caches = cores.size() / 2; 
+    int cnt = 0; 
+    vector<bool> cached(cores.size(),0);
+    while(cnt < caches){
+        int i = get_rand(0,cores.size());
+        if(!cached[i]){
+            cnt ++;
+            cached[i] = 1; 
+        }
+    }
+
+    for(size_t i = 0; i < cores.size(); i++){
+        if(cached[i])
+            cores[i].set_cache(new Cache(MAX_AGGR_CACHE));
+    }
+
 }
 
 /*
@@ -330,6 +354,22 @@ vector<int> fattree::Engine::get_aggr_miss_cnt(){
     vector<int> cnt(aggrs.size(),-1);
     for(size_t i = 0; i < aggrs.size(); i++){
         cnt[i] = aggrs[i].get_cache_miss();
+    }
+    return cnt;
+}
+
+vector<int> fattree::Engine::get_core_hit_cnt(){
+    vector<int> cnt(cores.size(),-1);
+    for(size_t i = 0; i < cores.size(); i++){
+        cnt[i] = cores[i].get_cache_hit();
+    }
+    return cnt;
+}
+
+vector<int> fattree::Engine::get_core_miss_cnt(){
+    vector<int> cnt(cores.size(),-1);
+    for(size_t i = 0; i < cores.size(); i++){
+        cnt[i] = cores[i].get_cache_miss();
     }
     return cnt;
 }

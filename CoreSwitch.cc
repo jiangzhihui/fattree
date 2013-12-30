@@ -4,9 +4,15 @@
 #include "AggrSwitch.h"
 #include "utility.h" 
 #include "packet.h"
+#include "Cache.h"
 #include "debug.h"
 
 using namespace std; 
+
+fattree::CoreSwitch::~CoreSwitch(){
+    if(cache)
+        delete cache;
+}
 
 void fattree::CoreSwitch::set_switch(size_t port_id,AggrSwitch*s){
     switches[port_id] = s;
@@ -44,6 +50,12 @@ void fattree::CoreSwitch::print_route_table(){
 }
 
 void fattree::CoreSwitch::send_packet(const Packet & pkt){
+    if(cache){
+        unsigned int key = generate_pkt_key(pkt);
+        Packet p;
+        if(!cache->get(key,p))
+            cache->put(key,p);
+    }
     string dest = pkt.dest;
     vector<int> ips = split_ip(dest);
     string mask = connect_ip("10",itoa(ips[1]),"0","0");
@@ -51,4 +63,16 @@ void fattree::CoreSwitch::send_packet(const Packet & pkt){
     assert(pos != route_table.end());
     Debug::info("Core Switch " + get_ip() + " send a packet to " + switches[pos->second]->get_ip());
     switches[pos->second]->send_packet(pkt);
+}
+
+int fattree::CoreSwitch::get_cache_hit(){
+    if(cache)
+        return cache->hit_cnt();
+    return -1;
+}
+
+int fattree::CoreSwitch::get_cache_miss(){
+    if(cache)
+        return cache->miss_cnt();
+    return -1;
 }

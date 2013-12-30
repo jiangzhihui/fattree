@@ -32,6 +32,8 @@ ports is the number of port of the switches
 */
 string rand_ip(int ports);
 
+class Packet;
+unsigned int generate_pkt_key(const Packet & pkt);
 
 }//fattree
 

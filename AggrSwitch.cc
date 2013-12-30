@@ -10,6 +10,11 @@
 
 using namespace std; 
 
+fattree::AggrSwitch::~AggrSwitch(){
+    if(cache)
+        delete cache;
+}
+
 void fattree::AggrSwitch::set_switch(size_t port, CoreSwitch*s){
     cs[port-ports/2] = s;
 }

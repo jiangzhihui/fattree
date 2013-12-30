@@ -21,6 +21,8 @@ public:
  //       generate_route_table();
     }    
 
+    ~AggrSwitch();
+
     void set_switch(size_t port_id, CoreSwitch* s);
     void set_switch(size_t port_id, EdgeSwitch* s);
     void send_packet(const Packet &);

@@ -11,6 +11,11 @@
 
 using namespace std; 
 
+fattree::EdgeSwitch::~EdgeSwitch(){
+    if(cache)
+        delete cache;
+}
+
 void fattree::EdgeSwitch::set_switch(size_t port, AggrSwitch*s){
     switches[port-ports/2] = s;
 }

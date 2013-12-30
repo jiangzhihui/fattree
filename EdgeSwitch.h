@@ -17,6 +17,8 @@ public:
     EdgeSwitch(std::string ip="", size_t ports = 4)
         :ports(ports),hosts(ports/2),switches(ports/2),ip(ip),cache(NULL)
     {}
+    
+    ~EdgeSwitch();
 
     void set_host(size_t port_id, Host * host);
     void set_switch(size_t port_id, AggrSwitch* s);

@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include <algorithm>
 #include "utility.h"
+#include "packet.h"
 
 using namespace std; 
 
@@ -51,6 +52,10 @@ string rand_ip(int ports){
     int h   = get_rand(2,ports/2+2);
 
     return connect_ip("10",itoa(pod),itoa(swi),itoa(h));
+}
+
+unsigned int generate_pkt_key(const Packet & pkt){
+    return pkt.data[0];    
 }
 
 }//fattree
