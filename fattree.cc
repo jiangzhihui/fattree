@@ -3,6 +3,7 @@
 #include <cassert>
 #include <climits>
 #include "fattree.h"
+#include "zipf.h"
 
 namespace fattree{
 
@@ -275,7 +276,7 @@ void fattree::Engine::set_core_cache(){
 
     for(size_t i = 0; i < cores.size(); i++){
         if(cached[i])
-            cores[i].set_cache(new Cache(MAX_AGGR_CACHE));
+            cores[i].set_cache(new Cache(cfg.max_core_cache));
     }
 
 }
@@ -297,7 +298,7 @@ void fattree::Engine::set_aggr_cache(){
 
     for(size_t i = 0; i < aggrs.size(); i++){
         if(cached[i])
-            aggrs[i].set_cache(new Cache(MAX_AGGR_CACHE));
+            aggrs[i].set_cache(new Cache(cfg.max_aggr_cache));
     }
 }
 
@@ -318,7 +319,7 @@ void fattree::Engine::set_edge_cache(){
 
     for(size_t i = 0; i < edges.size(); i++){
         if(cached[i]){
-            edges[i].set_cache(new Cache(MAX_EDGE_CACHE));
+            edges[i].set_cache(new Cache(cfg.max_edge_cache));
         }
     }
 }
@@ -452,8 +453,17 @@ Packet fattree::Engine::generate_rand_packet(){
     while((dest=rand_ip(k)) == src){}                             
     pkt.src = src;
     pkt.dest = dest;
+    /*
+    //packet data random distribution 
     for(int i = 0; i < MAX_LENGTH; i++)
         pkt.data[i] = get_rand(0,USHRT_MAX);    
+    */
+
+    //packet data zipf distribution 
+    Zipf zipf(0.5,USHRT_MAX);
+    for(int i = 0; i < MAX_LENGTH; i ++){
+        pkt.data[i] = zipf.next();
+    }
 
     string debug_info = "Generated a packet with source " + src + " and dest " + dest; 
     Debug::info(debug_info);

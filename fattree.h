@@ -13,9 +13,15 @@
 
 namespace fattree{
 
+struct Config{
+    size_t max_edge_cache;
+    size_t max_aggr_cache; 
+    size_t max_core_cache;
+};
+
 class Engine{
 public:
-    Engine(int k):k(k),hosts(k*k*k/4),cores(k*k/4),edges(k*k/2),aggrs(k*k/2){
+    Engine(int k,Config cfg):k(k),hosts(k*k*k/4),cores(k*k/4),edges(k*k/2),aggrs(k*k/2),cfg(cfg){
         init_devices();    
         connect_devices();
     }
@@ -71,6 +77,7 @@ private:
     static const unsigned int MAX_EDGE_CACHE = 10000;
     static const unsigned int MAX_AGGR_CACHE = 1000; 
     static const unsigned int MAX_CORE_CACHE = 1000;
+    Config cfg;
 };//engine 
 
 }//fattree
