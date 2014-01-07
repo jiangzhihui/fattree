@@ -263,9 +263,9 @@ void fattree::Engine::set_caches(){
 select random core switches to set a cache
 */
 void fattree::Engine::set_core_cache(){
-    int caches = cores.size() / 2; 
+    /*
+    int caches = cores.size(); 
     int cnt = 0; 
-    vector<bool> cached(cores.size(),0);
     while(cnt < caches){
         int i = get_rand(0,cores.size());
         if(!cached[i]){
@@ -273,7 +273,9 @@ void fattree::Engine::set_core_cache(){
             cached[i] = 1; 
         }
     }
+    */
 
+    vector<bool> cached(cores.size(),1);
     for(size_t i = 0; i < cores.size(); i++){
         if(cached[i])
             cores[i].set_cache(new Cache(cfg.max_core_cache));
@@ -285,9 +287,9 @@ void fattree::Engine::set_core_cache(){
 select random aggr switches to set a cache
 */
 void fattree::Engine::set_aggr_cache(){
-    int caches = aggrs.size() / 2; 
+    /*
+    int caches = aggrs.size(); 
     int cnt = 0; 
-    vector<bool> cached(aggrs.size(),0);
     while(cnt < caches){
         int i = get_rand(0,aggrs.size());
         if(!cached[i]){
@@ -295,7 +297,9 @@ void fattree::Engine::set_aggr_cache(){
             cached[i] = 1; 
         }
     }
+    */
 
+    vector<bool> cached(aggrs.size(),1);
     for(size_t i = 0; i < aggrs.size(); i++){
         if(cached[i])
             aggrs[i].set_cache(new Cache(cfg.max_aggr_cache));
@@ -306,9 +310,9 @@ void fattree::Engine::set_aggr_cache(){
 select random edge switches to set a cache
 */
 void fattree::Engine::set_edge_cache(){
+    /*
     int caches = edges.size()/2;   
     int cnt = 0; 
-    vector<bool> cached(edges.size(),0);  
     while(cnt < caches){
         int i = get_rand(0,edges.size());
         if(!cached[i]){
@@ -316,7 +320,9 @@ void fattree::Engine::set_edge_cache(){
             cached[i] = 1;    
         }
     }
+    */
 
+    vector<bool> cached(edges.size(),1);  
     for(size_t i = 0; i < edges.size(); i++){
         if(cached[i]){
             edges[i].set_cache(new Cache(cfg.max_edge_cache));
@@ -453,17 +459,17 @@ Packet fattree::Engine::generate_rand_packet(){
     while((dest=rand_ip(k)) == src){}                             
     pkt.src = src;
     pkt.dest = dest;
-    /*
     //packet data random distribution 
     for(int i = 0; i < MAX_LENGTH; i++)
-        pkt.data[i] = get_rand(0,USHRT_MAX);    
-    */
+        pkt.data[i] = get_rand(0,1000);    
 
+    /*
     //packet data zipf distribution 
     Zipf zipf(0.5,USHRT_MAX);
     for(int i = 0; i < MAX_LENGTH; i ++){
         pkt.data[i] = zipf.next();
     }
+    */
 
     string debug_info = "Generated a packet with source " + src + " and dest " + dest; 
     Debug::info(debug_info);
@@ -481,6 +487,27 @@ void fattree::Engine::send_packet(Packet & pkt){
     //cout << pod <<  " " << swi << " " << h << " " << id << endl;
     assert(id < hosts.size());
     hosts[id].send_packet(pkt);
+}
+
+vector<string> fattree::Engine::get_edge_ips(){
+    vector<string> re; 
+    for(size_t i = 0; i < edges.size(); i++)
+        re.push_back(edges[i].get_ip());
+    return re;
+}
+
+vector<string> fattree::Engine::get_aggr_ips(){
+    vector<string> re; 
+    for(size_t i = 0; i < aggrs.size(); i++)
+        re.push_back(aggrs[i].get_ip());
+    return re;
+}
+
+vector<string> fattree::Engine::get_core_ips(){
+    vector<string> re; 
+    for(size_t i = 0; i < cores.size(); i++)
+        re.push_back(cores[i].get_ip());
+    return re;
 }
 
 }//fattree

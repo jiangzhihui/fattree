@@ -48,6 +48,9 @@ public:
     std::vector<int> get_aggr_miss_cnt();
     std::vector<int> get_core_hit_cnt();
     std::vector<int> get_core_miss_cnt();
+    std::vector<std::string> get_edge_ips(); 
+    std::vector<std::string> get_aggr_ips(); 
+    std::vector<std::string> get_core_ips(); 
 
 private:
     void init_devices();

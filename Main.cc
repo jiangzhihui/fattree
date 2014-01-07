@@ -18,6 +18,7 @@
 #include<deque>
 #include<list>
 #include<algorithm>
+#include<numeric>
 #include<cmath>
 #include<cstdlib>
 #include "fattree.h"
@@ -39,9 +40,10 @@ Config read_config(string file_name){
     return re;
 }
 
-void write_result(vector<int>& hits , vector<int> & miss,ofstream & out){
-    for(int i = 0;i < hits.size(); i ++){
+void write_result(vector<string> & ips , vector<int>& hits , vector<int> & miss,ofstream & out){
+    for(size_t i = 0;i < hits.size(); i ++){
         if(hits[i] >= 0){
+            out << ips[i] << ":    "; 
             out << hits[i] << ":" << miss[i] <<":" << hits[i]*1.0/(hits[i]+miss[i])*100 << "%" << endl;
         }
     }
@@ -51,16 +53,22 @@ int main()
 {
     srand(time(NULL));
     string config_files [] = {"config1","config2","config3","config4"};
-    ofstream out("result1",ios::out|ios::app);
-    for(int ports = 4; ports <= 12; ports += 4){
+    ofstream out("result",ios::out|ios::app);
+    for(int ports = 4; ports <= 4; ports += 4){
         for(int i = 0; i < 3; i ++){
             Config cfg = read_config(config_files[i]);
             Engine e(ports,cfg);    
-            for(int packets = 1000; packets <= 100000; packets *= 10){
+            vector<string> edgeip = e.get_edge_ips();
+            vector<string> aggrip = e.get_aggr_ips(); 
+            vector<string> coreip = e.get_core_ips();
+            for(int packets = 10000; packets <= 10000; packets *= 10){
                 for(int i = 0; i < packets; i ++){
                     Packet p = e.generate_rand_packet();
+                    if(p.src==p.dest){
+                        cout << "src == dest" << endl;
+                    }
                     e.send_packet(p);
-                    cout << i << endl;
+    //                cout << i << endl;
     //                cout << endl;
                 }
 
@@ -68,8 +76,12 @@ int main()
                 out << "Edge statics: " << endl;
                 vector<int> hits = e.get_edge_hit_cnt();
                 vector<int> miss = e.get_edge_miss_cnt(); 
-                write_result(hits,miss,out);
-
+                write_result(edgeip,hits,miss,out);
+                int sum = 0; 
+                sum = accumulate(hits.begin(),hits.end(),sum);
+                sum = accumulate(miss.begin(),miss.end(),sum);
+                cout <<"edge " <<  sum  << " " << packets<< endl; 
+                
                 /*
                 cout << "edge switch hit and miss " << endl;
                 for(size_t i = 0; i < hits.size(); i++){
@@ -82,7 +94,11 @@ int main()
                 out << "Aggr statics:" << endl;
                 hits = e.get_aggr_hit_cnt();
                 miss = e.get_aggr_miss_cnt(); 
-                write_result(hits,miss,out);
+                write_result(aggrip,hits,miss,out);
+                sum = 0; 
+                sum = accumulate(hits.begin(),hits.end(),sum);
+                sum = accumulate(miss.begin(),miss.end(),sum);
+                cout <<"Aggr " <<  sum  << " " << packets<< endl; 
                 /*
                 cout << "Aggr switch hit and miss " << endl;
                 for(size_t i = 0; i < hits.size(); i++){
@@ -95,7 +111,11 @@ int main()
                 out << "Core statics:" << endl;
                 hits = e.get_core_hit_cnt();
                 miss = e.get_core_miss_cnt();
-                write_result(hits,miss,out);
+                write_result(coreip,hits,miss,out);
+                sum = 0; 
+                sum = accumulate(hits.begin(),hits.end(),sum);
+                sum = accumulate(miss.begin(),miss.end(),sum);
+                cout <<"Core " <<  sum  << " " << packets<< endl; 
                 /*
                 cout << endl << endl;
                 cout << "core switch hit and miss " << endl; 
