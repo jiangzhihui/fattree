@@ -64,18 +64,33 @@ void fattree::AggrSwitch::print_route_table(){
 
 void fattree::AggrSwitch::send_packet(const Packet& pkt){
     //handle cache
+    string dest = pkt.dest;
+    vector<int> ips = split_ip(dest);
+    string prefix = connect_ip("10",itoa(ips[1]),itoa(ips[2]),"0");
+    bool up ; 
+    if(table1.find(prefix) == table1.end())
+        up = true;
+    else 
+        up = false;
+
     unsigned int data = pkt.data[0];
     if(cache){
         Packet p; 
         if(!cache->get(data,p)){
             cache->put(data,p);    
+            if(up)
+                up_miss ++; 
+            else 
+                down_miss ++;
+        }else {
+            if(up)
+                up_hit ++; 
+            else 
+                down_hit ++;
         }
     }
 
     //route packet
-    string dest = pkt.dest;
-    vector<int> ips = split_ip(dest);
-    string prefix = connect_ip("10",itoa(ips[1]),itoa(ips[2]),"0");
     IpPortTable::iterator pos = table1.find(prefix);
     if(pos != table1.end()){
         size_t i = pos->second;
@@ -103,4 +118,12 @@ int fattree::AggrSwitch::get_cache_miss(){
     if(cache)
         return cache->miss_cnt();
     return -1;
+}
+
+pair<int,int> fattree::AggrSwitch::get_cache_hit_pair(){
+    return pair<int,int>(up_hit,down_hit);
+}
+
+pair<int,int> fattree::AggrSwitch::get_cache_miss_pair(){
+    return pair<int,int>(up_miss,down_miss);
 }

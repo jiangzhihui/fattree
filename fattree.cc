@@ -510,4 +510,37 @@ vector<string> fattree::Engine::get_core_ips(){
     return re;
 }
 
+vector<pair<int,int> > fattree::Engine::get_edge_hit_cnt_pair(){
+    vector<pair<int,int> > re;
+    for(size_t i = 0; i < edges.size(); i++){
+        re.push_back(edges[i].get_cache_hit_pair()); 
+    }
+    return re;
+}
+
+vector<pair<int,int> > fattree::Engine::get_edge_miss_cnt_pair(){
+    vector<pair<int,int> > re;
+    for(size_t i = 0; i < edges.size(); i++){
+        re.push_back(edges[i].get_cache_miss_pair()); 
+    }
+    return re;
+}
+
+vector<pair<int,int> > fattree::Engine::get_aggr_hit_cnt_pair(){
+    vector<pair<int,int> > re;
+    for(size_t i = 0; i < aggrs.size(); i++){
+        re.push_back(aggrs[i].get_cache_hit_pair()); 
+    }
+    return re;
+    
+}
+
+vector<pair<int,int> > fattree::Engine::get_aggr_miss_cnt_pair(){
+    vector<pair<int,int> > re;
+    for(size_t i = 0; i < aggrs.size(); i++){
+        re.push_back(aggrs[i].get_cache_miss_pair()); 
+    }
+    return re;
+}
+
 }//fattree

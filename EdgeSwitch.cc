@@ -50,12 +50,30 @@ If not found, then the send the packet to upper level switches
 */
 void fattree::EdgeSwitch::send_packet(const Packet& pkt){
     string dest = pkt.dest; 
+
+    bool up;            //link direction type up or down 
+    if(table.find(dest) == table.end())
+        up = true;
+    else 
+        up = false;
+
     unsigned int data = pkt.data[0];
     if(cache){
         Packet p; 
-        if(!cache->get(data,p))
+        if(!cache->get(data,p)){
             cache->put(data,p);
+            if(up)
+                up_miss ++;
+            else 
+                down_miss ++; 
+        }else {
+            if(up)
+                up_hit ++; 
+            else 
+                down_hit ++;
+        }
     }
+
     IpPortTable::iterator pos = table.find(dest);
     if(pos != table.end()){
         int port = pos->second;
@@ -80,3 +98,12 @@ int fattree::EdgeSwitch::get_cache_miss(){
     return -1;
 }
 
+//return the up link and down link hit count as a pair
+pair<int,int> fattree::EdgeSwitch::get_cache_hit_pair(){
+    return pair<int,int>(up_hit,down_hit);
+}
+
+//return the up link and down link miss count as a pair
+pair<int,int> fattree::EdgeSwitch::get_cache_miss_pair(){
+    return pair<int,int>(up_miss,down_miss);
+}

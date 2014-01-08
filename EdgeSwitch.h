@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <string> 
+#include <utility>
 #include "utility.h"
 
 namespace fattree{
@@ -16,7 +17,9 @@ class EdgeSwitch{
 public:
     EdgeSwitch(std::string ip="", size_t ports = 4)
         :ports(ports),hosts(ports/2),switches(ports/2),ip(ip),cache(NULL)
-    {}
+    {
+        up_hit = down_hit = up_miss = down_miss = 0;     
+    }
     
     ~EdgeSwitch();
 
@@ -32,6 +35,8 @@ public:
     void print_route_table();
     int get_cache_hit();
     int get_cache_miss();
+    std::pair<int,int> get_cache_hit_pair( );
+    std::pair<int,int> get_cache_miss_pair();
     void set_cache(Cache * c){
         cache = c;
     }
@@ -45,6 +50,7 @@ private:
     //table stores the map to hosts
     IpPortTable table;
     Cache * cache;
+    int up_hit,down_hit,up_miss,down_miss;
 
 };//EdgeSwitch
 

@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <string>
+#include <utility>
 #include "host.h"
 #include "EdgeSwitch.h" 
 #include "AggrSwitch.h" 
@@ -51,6 +52,10 @@ public:
     std::vector<std::string> get_edge_ips(); 
     std::vector<std::string> get_aggr_ips(); 
     std::vector<std::string> get_core_ips(); 
+    std::vector<std::pair<int,int> > get_edge_hit_cnt_pair();
+    std::vector<std::pair<int,int> > get_edge_miss_cnt_pair();
+    std::vector<std::pair<int,int> > get_aggr_hit_cnt_pair();
+    std::vector<std::pair<int,int> > get_aggr_miss_cnt_pair();
 
 private:
     void init_devices();

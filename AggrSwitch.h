@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <string>
+#include <utility>
 #include "utility.h"
 
 namespace fattree{
@@ -18,7 +19,7 @@ public:
     AggrSwitch(std::string ip="",size_t ports = 4)
         :ports(ports),es(ports/2),cs(ports/2),ip(ip),cache(NULL)
     {
- //       generate_route_table();
+        up_hit = down_hit = up_miss = down_miss = 0;
     }    
 
     ~AggrSwitch();
@@ -41,6 +42,9 @@ public:
         cache = c;
     }
 
+    std::pair<int,int> get_cache_hit_pair();
+    std::pair<int,int> get_cache_miss_pair();
+
 private:
 
 
@@ -51,6 +55,7 @@ private:
     std::string ip;
     IpPortTable table1,table2; 
     Cache* cache ; 
+    int up_hit,down_hit,up_miss,down_miss;
 
 };//AggrSwtich
 
