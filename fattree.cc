@@ -461,7 +461,7 @@ Packet fattree::Engine::generate_rand_packet(){
     pkt.dest = dest;
     //packet data random distribution 
     for(int i = 0; i < MAX_LENGTH; i++)
-        pkt.data[i] = get_rand(0,1000);    
+        pkt.data[i] = get_rand(0,MAX_KEY);    
 
     /*
     //packet data zipf distribution 

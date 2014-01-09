@@ -20,6 +20,8 @@ struct Config{
     size_t max_core_cache;
 };
 
+const int MAX_KEY = 10000;
+
 class Engine{
 public:
     Engine(int k,Config cfg):k(k),hosts(k*k*k/4),cores(k*k/4),edges(k*k/2),aggrs(k*k/2),cfg(cfg){
