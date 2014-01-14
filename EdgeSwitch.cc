@@ -10,6 +10,7 @@
 
 
 using namespace std; 
+using namespace fattree;
 
 fattree::EdgeSwitch::~EdgeSwitch(){
     if(cache)
@@ -106,4 +107,15 @@ pair<int,int> fattree::EdgeSwitch::get_cache_hit_pair(){
 //return the up link and down link miss count as a pair
 pair<int,int> fattree::EdgeSwitch::get_cache_miss_pair(){
     return pair<int,int>(up_miss,down_miss);
+}
+
+Switch* fattree::EdgeSwitch::next_hop(Packet * p){
+    string dest = p->dest;
+    IpPortTable::iterator pos = table.find(dest);
+    if(pos != table.end()){
+        return NULL;
+    }else{
+        int swi = rand()%switches.size();  
+        return switches[swi];
+    }
 }

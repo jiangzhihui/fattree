@@ -6,9 +6,11 @@
 #include "packet.h"
 #include "debug.h"
 #include "Cache.h"
+#include "Switch.h"
 
 
 using namespace std; 
+using namespace fattree;
 
 fattree::AggrSwitch::~AggrSwitch(){
     if(cache)
@@ -126,4 +128,24 @@ pair<int,int> fattree::AggrSwitch::get_cache_hit_pair(){
 
 pair<int,int> fattree::AggrSwitch::get_cache_miss_pair(){
     return pair<int,int>(up_miss,down_miss);
+}
+
+Switch* fattree::AggrSwitch::next_hop(Packet * pkt){
+    string dest = pkt->dest;
+    vector<int> ips = split_ip(dest);
+    string prefix = connect_ip("10",itoa(ips[1]),itoa(ips[2]),"0");
+    IpPortTable::iterator pos = table1.find(prefix);
+    if(pos != table1.end()){
+        size_t i = pos->second;
+        assert(i < es.size());
+        Debug::info("Aggr switch " +  get_ip() + " send a packet to " + es[i]->get_ip());
+        return es[i];
+    }else {
+        string suffix = connect_ip("0","0","0",itoa(ips[3]));
+        pos = table2.find(suffix);
+        assert(pos != table2.end());
+        int i = pos->second; 
+        Debug::info("Aggr switch " + get_ip() + " send a packet to " + cs[i]->get_ip());
+        return cs[i];
+    }
 }

@@ -1,4 +1,5 @@
 #include <sstream> 
+#include <fstream>
 #include <iostream>
 #include <cstdlib>
 #include <algorithm>
@@ -56,6 +57,19 @@ string rand_ip(int ports){
 
 unsigned int generate_pkt_key(const Packet & pkt){
     return pkt.data[0];    
+}
+
+Config read_config(string file_name){
+    ifstream in(file_name.c_str());
+    Config re; 
+
+    if(in.good()){
+        in >> re.max_edge_cache; 
+        in >> re.max_aggr_cache; 
+        in >> re.max_core_cache;
+    }
+
+    return re;
 }
 
 }//fattree

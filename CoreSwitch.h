@@ -4,6 +4,7 @@
 #include <string> 
 #include <vector>
 #include "utility.h"
+#include "Switch.h"
 
 namespace fattree{
 
@@ -11,7 +12,7 @@ class AggrSwitch;
 class Packet;
 class Cache;
 
-class CoreSwitch{
+class CoreSwitch:public Switch{
 public:
     CoreSwitch(std::string ip="",size_t ports = 4):ports(ports),switches(ports),ip(ip),cache(NULL){
 //        generate_route_table();     
@@ -21,7 +22,7 @@ public:
     void set_switch(size_t port_id, AggrSwitch* s);
     void send_packet(const Packet &  );
     void recv(size_t port);
-    std::string get_ip() const {
+    virtual std::string get_ip() const {
         return ip;
     }
     void generate_route_table();
@@ -33,6 +34,10 @@ public:
         cache = c;
     }
 
+    virtual Switch* next_hop(Packet *); 
+    virtual Cache* get_cache(){
+        return cache;
+    }
 private:
 
     //get the i,j position of a core switch from its ip address 

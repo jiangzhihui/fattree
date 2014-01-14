@@ -5,6 +5,7 @@
 #include <string> 
 #include <utility>
 #include "utility.h"
+#include "Switch.h"
 
 namespace fattree{
 
@@ -13,7 +14,7 @@ class AggrSwitch;
 class Packet;
 class Cache;
 
-class EdgeSwitch{
+class EdgeSwitch: public Switch{
 public:
     EdgeSwitch(std::string ip="", size_t ports = 4)
         :ports(ports),hosts(ports/2),switches(ports/2),ip(ip),cache(NULL)
@@ -27,7 +28,7 @@ public:
     void set_switch(size_t port_id, AggrSwitch* s);
     void send_packet(const Packet & pkt);
     void recv(size_t port);
-    std::string get_ip() const {
+    virtual std::string get_ip() const {
         return ip;
     }
     
@@ -41,6 +42,10 @@ public:
         cache = c;
     }
 
+    virtual Switch* next_hop(Packet*);
+    virtual Cache* get_cache(){
+        return cache;
+    }
 private:
     size_t ports; 
     std::vector<Host*> hosts;

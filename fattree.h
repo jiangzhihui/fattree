@@ -14,11 +14,6 @@
 
 namespace fattree{
 
-struct Config{
-    size_t max_edge_cache;
-    size_t max_aggr_cache; 
-    size_t max_core_cache;
-};
 
 const int MAX_KEY = 10000;
 
@@ -58,7 +53,7 @@ public:
     std::vector<std::pair<int,int> > get_edge_miss_cnt_pair();
     std::vector<std::pair<int,int> > get_aggr_hit_cnt_pair();
     std::vector<std::pair<int,int> > get_aggr_miss_cnt_pair();
-
+    Host get_host_by_ip(string src);
 private:
     void init_devices();
     void init_cores();             

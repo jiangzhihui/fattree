@@ -8,6 +8,7 @@
 #include "debug.h"
 
 using namespace std; 
+using namespace fattree;
 
 fattree::CoreSwitch::~CoreSwitch(){
     if(cache)
@@ -75,4 +76,15 @@ int fattree::CoreSwitch::get_cache_miss(){
     if(cache)
         return cache->miss_cnt();
     return -1;
+}
+
+Switch* CoreSwitch::next_hop(Packet* pkt){
+    string dest = pkt->dest;
+    vector<int> ips = split_ip(dest);
+    string mask = connect_ip("10",itoa(ips[1]),"0","0");
+    IpPortTable::iterator pos = route_table.find(mask);
+    assert(pos != route_table.end());
+    Debug::info("Core Switch " + get_ip() + " send a packet to " + switches[pos->second]->get_ip());
+    //switches[pos->second]->send_packet(pkt);
+    return switches[pos->second];
 }

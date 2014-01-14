@@ -11,6 +11,12 @@ define some utility functions and types
 
 namespace fattree{
 
+struct Config{
+    size_t max_edge_cache;
+    size_t max_aggr_cache; 
+    size_t max_core_cache;
+};
+
 //a map from ip to output port of a switch
 typedef std::map<std::string,int> IpPortTable;
 
@@ -34,6 +40,9 @@ string rand_ip(int ports);
 
 class Packet;
 unsigned int generate_pkt_key(const Packet & pkt);
+
+class Config;
+Config read_config(string file_name);
 
 }//fattree
 

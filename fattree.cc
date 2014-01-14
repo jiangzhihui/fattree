@@ -543,4 +543,12 @@ vector<pair<int,int> > fattree::Engine::get_aggr_miss_cnt_pair(){
     return re;
 }
 
+Host Engine::get_host_by_ip(string src){
+    vector<int> ips = split_ip(src);    
+    int pod = ips[1]; 
+    int swi = ips[2];
+    int h   = ips[3];
+    size_t id = pod * k/2*k/2 + swi*k/2 + (h-2) ;     
+    return hosts[id];
+}
 }//fattree
