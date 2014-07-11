@@ -33,3 +33,7 @@ int Zipf::next(){
 
     return 1;
 }
+
+int main(){
+    cout << "test pr" << endl;
+}
